@@ -10,6 +10,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
+
+const promoCodes = {
+  'BACKTOSCHOOL': 0.20,
+  'STUDENT15': 0.15,
+  'SUMMER15': 0.15
+};
+
+app.post('/api/validate-promo', async (req, res) => {
+  const { promoCode } = req.body;
+
+  if (promoCodes[promoCode]) {
+    return res.status(200).json({
+      valid: true,
+      discount: promoCodes[promoCode],
+    });
+  } else {
+    return res.status(400).json({
+      valid: false,
+      message: 'Invalid promo code',
+    });
+  }
+});
+
 app.post('/api/payment', async (req, res) => {
     const body = req.body;
     try {
@@ -32,4 +55,4 @@ app.post('/api/payment', async (req, res) => {
     }
   });
   
-  app.listen(5050, () => console.log('PORT listening on 5050'));  
+  app.listen(5050, () => console.log('PORT listening on 5050'));
